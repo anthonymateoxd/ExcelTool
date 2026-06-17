@@ -53,31 +53,49 @@ function Homepage() {
   const processFile = async file => {
     try {
       setIsLoading(true);
-      setStatus('Leyendo archivo de Excel...');
+      setStatus(`Leyendo archivo: ${file.name || 'archivo de Excel'}...`);
 
       const result = await readExcelFile(file);
 
-      setFileName(file.name);
+      if (!result.sheetNames.length) {
+        throw new Error('El archivo no contiene hojas de Excel disponibles.');
+      }
+
+      setFileName(file.name || 'archivo.xlsx');
       setSheetNames(result.sheetNames);
       setSheetsData(result.sheetsData);
-      setSelectedSheet(result.sheetNames[0] || '');
+      setSelectedSheet(result.sheetNames[0]);
       setSelectedCell(null);
 
-      setStatus(`Archivo cargado: ${file.name}`);
+      setStatus(`Archivo cargado: ${file.name || 'archivo de Excel'}`);
+
+      return true;
     } catch (error) {
-      setStatus(error.message);
+      console.error('Error al procesar el archivo:', error);
+
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo leer el archivo seleccionado.',
+      );
+
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFileChange = event => {
-    const file = event.target.files?.[0];
+  const handleFileChange = async event => {
+    const input = event.target;
+    const file = input.files?.[0];
 
     if (!file) return;
 
-    processFile(file);
-    event.target.value = '';
+    try {
+      await processFile(file);
+    } finally {
+      input.value = '';
+    }
   };
 
   const handleDrop = event => {
@@ -197,7 +215,7 @@ function Homepage() {
           <input
             id='excel-file'
             type='file'
-            accept='.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
+            accept='.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/octet-stream'
             className='upload-box__input'
             onChange={handleFileChange}
           />
@@ -232,6 +250,43 @@ function Homepage() {
                 </div>
               </label>
             </>
+          )}
+
+          {status && status !== 'Esperando archivo' && (
+            <div
+              className={
+                status.toLowerCase().includes('error') ||
+                status.toLowerCase().includes('no se pudo') ||
+                status.toLowerCase().includes('vacío')
+                  ? 'file-status file-status--error'
+                  : 'file-status'
+              }
+            >
+              {status}
+            </div>
+          )}
+
+          {fileName && (
+            <div className='workbook-panel'>
+              <div>
+                <span>Archivo cargado</span>
+                <strong>{fileName}</strong>
+              </div>
+
+              <button
+                type='button'
+                className='download-button'
+                onClick={handleDownload}
+              >
+                Descargar Excel modificado
+              </button>
+            </div>
+          )}
+
+          {selectedSheet && (
+            <section className='sheet-workspace'>
+              {/* Aquí continúa todo tu Excel */}
+            </section>
           )}
 
           {fileName && (
