@@ -23,30 +23,37 @@ export async function readExcelFile(file) {
   }
 
   const fileName = file.name || '';
+
   const extension = fileName.includes('.')
     ? fileName.split('.').pop().toLowerCase()
     : '';
 
-  const validExtensions = ['xlsx', 'xls'];
+  const excelExtensions = ['xlsx', 'xls'];
 
-  const validMimeTypes = [
+  const excelMimeTypes = [
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.ms-excel',
-    'application/octet-stream',
-    '',
   ];
 
-  const hasValidExtension = validExtensions.includes(extension);
-  const hasValidMimeType = validMimeTypes.includes(file.type);
+  const hasExcelExtension = excelExtensions.includes(extension);
+  const hasExcelMimeType = excelMimeTypes.includes(file.type);
+
+  const isPdf = extension === 'pdf' || file.type === 'application/pdf';
+
+  if (isPdf) {
+    throw new Error(
+      `Google Drive entregó el archivo como PDF: ${fileName}. Debes seleccionar un archivo Excel .xlsx o .xls.`,
+    );
+  }
 
   /*
-   * Algunos proveedores de Android no entregan correctamente
-   * la extensión o usan application/octet-stream.
+   * Algunos teléfonos entregan un Excel real con MIME genérico,
+   * pero conservan correctamente la extensión .xlsx o .xls.
    */
-  if (!hasValidExtension && !hasValidMimeType) {
+  if (!hasExcelExtension && !hasExcelMimeType) {
     throw new Error(
-      `El archivo seleccionado no parece ser un Excel. Nombre: ${
-        fileName || 'desconocido'
+      `Solo se permiten archivos Excel .xlsx o .xls. Archivo recibido: ${
+        fileName || 'sin nombre'
       }`,
     );
   }
