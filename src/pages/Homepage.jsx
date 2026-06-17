@@ -197,7 +197,7 @@ function Homepage() {
           <input
             id='excel-file'
             type='file'
-            accept='.xlsx,.xls'
+            accept='.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
             className='upload-box__input'
             onChange={handleFileChange}
           />
