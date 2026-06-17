@@ -1,0 +1,251 @@
+.sidebar {
+  width: 320px;
+  flex: 0 0 320px;
+  min-height: 100vh;
+  padding: 26px 22px;
+  background: #ffffff;
+  color: #111827;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -12px 0 35px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition:
+    width 0.2s ease,
+    flex-basis 0.2s ease,
+    padding 0.2s ease;
+}
+
+.sidebar--collapsed {
+  width: 58px;
+  flex: 0 0 58px;
+  padding: 18px 10px;
+  align-items: center;
+  background: #ffffff;
+}
+
+.sidebar__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sidebar__header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.sidebar__header p {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.sidebar__toggle {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.sidebar__toggle:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #1d4ed8;
+}
+
+.sidebar__toggle--collapsed {
+  width: 38px;
+  height: 38px;
+  font-size: 20px;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.sidebar__option {
+  width: 100%;
+  min-height: 48px;
+  padding: 14px 16px;
+  border: 1px solid #dbe3ef;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar__option:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #1d4ed8;
+}
+
+.sidebar__option:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sidebar__option--primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.sidebar__option--primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 100%;
+    flex: 0 0 auto;
+    min-height: auto;
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .sidebar--collapsed {
+    width: 100%;
+    flex: 0 0 auto;
+    min-height: 58px;
+    align-items: flex-start;
+  }
+
+  .sidebar__nav {
+    margin-top: 24px;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    flex: 0 0 auto;
+    min-height: auto;
+    padding: 10px 12px;
+    background: #ffffff;
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.12);
+    z-index: 100;
+  }
+
+  .sidebar__top {
+    display: none;
+  }
+
+  .sidebar__nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  .sidebar__option {
+    min-height: 48px;
+    padding: 10px 8px;
+    justify-content: center;
+    text-align: center;
+    font-size: 13px;
+    border-radius: 14px;
+  }
+
+  .sidebar--collapsed {
+    position: fixed;
+    left: auto;
+    right: 14px;
+    bottom: 14px;
+    width: 54px;
+    flex: 0 0 54px;
+    min-height: 54px;
+    padding: 8px;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+    z-index: 101;
+  }
+
+  .sidebar__toggle--collapsed {
+    width: 38px;
+    height: 38px;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    flex: 0 0 auto;
+    min-height: auto;
+    padding: 8px 10px;
+    background: #ffffff;
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.12);
+    z-index: 100;
+  }
+
+  .sidebar__top {
+    display: none;
+  }
+
+  .sidebar__nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+    margin-top: 0;
+  }
+
+  .sidebar__option {
+    min-height: 42px;
+    padding: 8px 6px;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+    border-radius: 12px;
+  }
+
+  .sidebar--collapsed {
+    position: fixed;
+    left: auto;
+    right: 12px;
+    bottom: 12px;
+    width: 48px;
+    flex: 0 0 48px;
+    min-height: 48px;
+    padding: 6px;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+    z-index: 101;
+  }
+
+  .sidebar__toggle--collapsed {
+    width: 34px;
+    height: 34px;
+  }
+}

@@ -1,0 +1,9 @@
+services:
+  exceltool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: exceltool_app
+    ports:
+      - '8080:80'
+    restart: unless-stopped
