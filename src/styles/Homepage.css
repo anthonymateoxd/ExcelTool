@@ -2,18 +2,21 @@
   width: 100%;
   min-height: 100vh;
   display: flex;
+  align-items: stretch;
   background: #f4f7fb;
   color: #172033;
   font-family: Arial, Helvetica, sans-serif;
-}
-
-.homepage__content {
-  flex: 1;
-  min-width: 0;
-  padding: 40px;
   overflow-x: hidden;
 }
 
+.homepage__content {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  padding: 40px;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
 .upload-section {
   width: 100%;
   max-width: none;
@@ -580,4 +583,11 @@
   border-color: #fecaca;
   background: #fef2f2;
   color: #b91c1c;
+}
+.upload-section,
+.workbook-panel,
+.sheet-workspace,
+.excel-table-wrapper {
+  max-width: 100%;
+  box-sizing: border-box;
 }

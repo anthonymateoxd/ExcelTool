@@ -285,29 +285,6 @@ function Homepage() {
 
           {selectedSheet && (
             <section className='sheet-workspace'>
-              {/* Aquí continúa todo tu Excel */}
-            </section>
-          )}
-
-          {fileName && (
-            <div className='workbook-panel'>
-              <div>
-                <span>Archivo cargado</span>
-                <strong>{fileName}</strong>
-              </div>
-
-              <button
-                type='button'
-                className='download-button'
-                onClick={handleDownload}
-              >
-                Descargar Excel modificado
-              </button>
-            </div>
-          )}
-
-          {selectedSheet && (
-            <section className='sheet-workspace'>
               <section className='sheet-workspace'>
                 <div className='sheet-toolbar'>
                   <div>
