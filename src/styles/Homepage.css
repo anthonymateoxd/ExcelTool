@@ -8,7 +8,6 @@
   font-family: Arial, Helvetica, sans-serif;
   overflow-x: hidden;
 }
-
 .homepage__content {
   flex: 1 1 auto;
   width: auto;
@@ -20,7 +19,9 @@
 .upload-section {
   width: 100%;
   max-width: none;
+  min-width: 0;
   margin: 0;
+  box-sizing: border-box;
 }
 
 .upload-section__header {
@@ -54,6 +55,7 @@
 
 .upload-box {
   width: 100%;
+  max-width: 100%;
   min-height: 230px;
   display: flex;
   align-items: center;
@@ -66,6 +68,8 @@
   cursor: pointer;
   transition: 0.2s ease;
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .upload-box:hover {
@@ -588,6 +592,15 @@
 .workbook-panel,
 .sheet-workspace,
 .excel-table-wrapper {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.upload-section,
+.upload-box,
+.workbook-panel,
+.sheet-workspace,
+.excel-table-wrapper {
+  min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
 }
