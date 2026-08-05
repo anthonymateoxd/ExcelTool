@@ -22,17 +22,12 @@ function Homepage() {
   const [status, setStatus] = useState('Esperando archivo');
   const [isLoading, setIsLoading] = useState(false);
   const [insertedImages, setInsertedImages] = useState([]);
+  const [selectedImageId, setSelectedImageId] = useState(null);
 
   const gridRef = useRef(null);
 
   const handleInsertImage = newImage => {
     setInsertedImages(currentImages => {
-      /*
-       * Primera versión:
-       * solamente permite una imagen por celda.
-       * Si ya existe una imagen en esa celda,
-       * se reemplaza por la nueva.
-       */
       const imagesWithoutCurrentCell = currentImages.filter(
         image =>
           !(
@@ -43,7 +38,30 @@ function Homepage() {
 
       return [...imagesWithoutCurrentCell, newImage];
     });
+
+    setSelectedImageId(newImage.id);
   };
+
+  const handleUpdateImage = useCallback((imageId, changes) => {
+    setInsertedImages(currentImages =>
+      currentImages.map(image =>
+        image.id === imageId
+          ? {
+              ...image,
+              ...changes,
+            }
+          : image,
+      ),
+    );
+  }, []);
+
+  const handleDeleteImage = useCallback(imageId => {
+    setInsertedImages(currentImages =>
+      currentImages.filter(image => image.id !== imageId),
+    );
+
+    setSelectedImageId(currentId => (currentId === imageId ? null : currentId));
+  }, []);
   const currentSheetData = useMemo(() => {
     if (!selectedSheet) return [];
 
@@ -78,6 +96,8 @@ function Homepage() {
 
   const processFile = async file => {
     try {
+      setInsertedImages([]);
+      setSelectedImageId(null);
       setIsLoading(true);
       setStatus(`Leyendo archivo: ${file.name || 'archivo de Excel'}...`);
 
@@ -390,6 +410,7 @@ function Homepage() {
               <div
                 ref={gridRef}
                 className='excel-table-wrapper'
+                onPointerDown={() => setSelectedImageId(null)}
               >
                 <table className='excel-table'>
                   <thead>
@@ -452,7 +473,11 @@ function Homepage() {
               <SpreadsheetImageOverlay
                 images={insertedImages}
                 selectedSheet={selectedSheet}
+                selectedImageId={selectedImageId}
                 gridRef={gridRef}
+                onSelectImage={setSelectedImageId}
+                onUpdateImage={handleUpdateImage}
+                onDeleteImage={handleDeleteImage}
               />
             </section>
           )}
