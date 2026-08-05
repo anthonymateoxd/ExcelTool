@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useRef } from 'react';
 import Sidebar from '../elements/Sidebar';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import {
@@ -7,6 +7,10 @@ import {
   getColumnLabel,
   readExcelFile,
 } from '../utils/excelUtils';
+import {
+  ImageInsertPanel,
+  SpreadsheetImageOverlay,
+} from '../features/excelImages';
 import '../styles/Homepage.css';
 
 function Homepage() {
@@ -17,7 +21,29 @@ function Homepage() {
   const [selectedCell, setSelectedCell] = useState(null);
   const [status, setStatus] = useState('Esperando archivo');
   const [isLoading, setIsLoading] = useState(false);
+  const [insertedImages, setInsertedImages] = useState([]);
 
+  const gridRef = useRef(null);
+
+  const handleInsertImage = newImage => {
+    setInsertedImages(currentImages => {
+      /*
+       * Primera versión:
+       * solamente permite una imagen por celda.
+       * Si ya existe una imagen en esa celda,
+       * se reemplaza por la nueva.
+       */
+      const imagesWithoutCurrentCell = currentImages.filter(
+        image =>
+          !(
+            image.sheetName === newImage.sheetName &&
+            image.cellAddress === newImage.cellAddress
+          ),
+      );
+
+      return [...imagesWithoutCurrentCell, newImage];
+    });
+  };
   const currentSheetData = useMemo(() => {
     if (!selectedSheet) return [];
 
@@ -66,7 +92,7 @@ function Homepage() {
       setSheetsData(result.sheetsData);
       setSelectedSheet(result.sheetNames[0]);
       setSelectedCell(null);
-
+      setInsertedImages([]);
       setStatus(`Archivo cargado: ${file.name || 'archivo de Excel'}`);
 
       return true;
@@ -285,143 +311,157 @@ function Homepage() {
 
           {selectedSheet && (
             <section className='sheet-workspace'>
-              <section className='sheet-workspace'>
-                <div className='sheet-toolbar'>
+              <div className='sheet-toolbar'>
+                <div>
+                  <span>Hoja activa</span>
+                  <select
+                    value={selectedSheet}
+                    onChange={event => handleSelectSheet(event.target.value)}
+                  >
+                    {sheetNames.map(sheetName => (
+                      <option
+                        key={sheetName}
+                        value={sheetName}
+                      >
+                        {sheetName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className='dictation-panel'>
                   <div>
-                    <span>Hoja activa</span>
-                    <select
-                      value={selectedSheet}
-                      onChange={event => handleSelectSheet(event.target.value)}
-                    >
-                      {sheetNames.map(sheetName => (
-                        <option
-                          key={sheetName}
-                          value={sheetName}
-                        >
-                          {sheetName}
-                        </option>
-                      ))}
-                    </select>
+                    <span>Celda seleccionada</span>
+                    <strong>{selectedCellLabel || 'Ninguna'}</strong>
                   </div>
 
-                  <div className='dictation-panel'>
-                    <div>
-                      <span>Celda seleccionada</span>
-                      <strong>{selectedCellLabel || 'Ninguna'}</strong>
-                    </div>
+                  <button
+                    type='button'
+                    className='microphone-button'
+                    onClick={handleStartDictation}
+                    disabled={!isSupported || isListening}
+                  >
+                    {isListening ? 'Escuchando...' : 'Activar micrófono'}
+                  </button>
 
+                  {isListening && (
                     <button
                       type='button'
-                      className='microphone-button'
-                      onClick={handleStartDictation}
-                      disabled={!isSupported || isListening}
+                      className='stop-button'
+                      onClick={stopListening}
                     >
-                      {isListening ? 'Escuchando...' : 'Activar micrófono'}
+                      Detener
                     </button>
-
-                    {isListening && (
-                      <button
-                        type='button'
-                        className='stop-button'
-                        onClick={stopListening}
-                      >
-                        Detener
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
+              </div>
 
-                {selectedCell && (
-                  <div className='cell-editor'>
-                    <label htmlFor='selected-cell-value'>
-                      Contenido de la celda {selectedCellLabel}
-                    </label>
+              {selectedCell && (
+                <div className='cell-editor'>
+                  <label htmlFor='selected-cell-value'>
+                    Contenido de la celda {selectedCellLabel}
+                  </label>
 
-                    <input
-                      id='selected-cell-value'
-                      type='text'
-                      value={selectedCellValue}
-                      onChange={event => updateSelectedCell(event.target.value)}
-                      placeholder='Contenido de la celda'
-                    />
-                  </div>
-                )}
+                  <input
+                    id='selected-cell-value'
+                    type='text'
+                    value={selectedCellValue}
+                    onChange={event => updateSelectedCell(event.target.value)}
+                    placeholder='Contenido de la celda'
+                  />
+                </div>
+              )}
 
-                {!isSupported && (
-                  <p className='warning-message'>
-                    Tu navegador no soporta reconocimiento de voz. Usa Chrome o
-                    Edge para esta función.
-                  </p>
-                )}
+              {!isSupported && (
+                <p className='warning-message'>
+                  Tu navegador no soporta reconocimiento de voz. Usa Chrome o
+                  Edge para esta función.
+                </p>
+              )}
 
-                {speechError && (
-                  <p className='warning-message'>{speechError}</p>
-                )}
+              {speechError && <p className='warning-message'>{speechError}</p>}
 
-                {transcript && (
-                  <p className='transcript-message'>
-                    Último dictado: <strong>{transcript}</strong>
-                  </p>
-                )}
+              {transcript && (
+                <p className='transcript-message'>
+                  Último dictado: <strong>{transcript}</strong>
+                </p>
+              )}
 
-                <div className='excel-table-wrapper'>
-                  <table className='excel-table'>
-                    <thead>
-                      <tr>
-                        <th className='excel-table__corner'></th>
+              <div
+                ref={gridRef}
+                className='excel-table-wrapper'
+              >
+                <table className='excel-table'>
+                  <thead>
+                    <tr>
+                      <th className='excel-table__corner'></th>
 
-                        {Array.from({ length: maxColumns }).map(
-                          (_, columnIndex) => (
-                            <th key={columnIndex}>
-                              {getColumnLabel(columnIndex)}
-                            </th>
-                          ),
-                        )}
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {Array.from({ length: visibleRows }).map(
-                        (_, rowIndex) => {
-                          const row = currentSheetData[rowIndex] || [];
-
-                          return (
-                            <tr key={rowIndex}>
-                              <th>{rowIndex + 1}</th>
-
-                              {Array.from({ length: maxColumns }).map(
-                                (_, columnIndex) => {
-                                  const cellValue = row[columnIndex] ?? '';
-                                  const isSelected =
-                                    selectedCell?.row === rowIndex &&
-                                    selectedCell?.column === columnIndex;
-
-                                  return (
-                                    <td
-                                      key={`${rowIndex}-${columnIndex}`}
-                                      className={
-                                        isSelected ? 'selected-cell' : ''
-                                      }
-                                      onClick={() =>
-                                        handleSelectCell(rowIndex, columnIndex)
-                                      }
-                                    >
-                                      {String(cellValue) || '\u00A0'}
-                                    </td>
-                                  );
-                                },
-                              )}
-                            </tr>
-                          );
-                        },
+                      {Array.from({ length: maxColumns }).map(
+                        (_, columnIndex) => (
+                          <th key={columnIndex}>
+                            {getColumnLabel(columnIndex)}
+                          </th>
+                        ),
                       )}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {Array.from({ length: visibleRows }).map((_, rowIndex) => {
+                      const row = currentSheetData[rowIndex] || [];
+
+                      return (
+                        <tr key={rowIndex}>
+                          <th>{rowIndex + 1}</th>
+
+                          {Array.from({ length: maxColumns }).map(
+                            (_, columnIndex) => {
+                              const cellValue = row[columnIndex] ?? '';
+
+                              const isSelected =
+                                selectedCell?.row === rowIndex &&
+                                selectedCell?.column === columnIndex;
+
+                              return (
+                                <td
+                                  key={`${rowIndex}-${columnIndex}`}
+                                  className={
+                                    isSelected
+                                      ? 'excel-data-cell selected-cell'
+                                      : 'excel-data-cell'
+                                  }
+                                  data-cell-address={getCellAddress(
+                                    rowIndex,
+                                    columnIndex,
+                                  )}
+                                  onClick={() =>
+                                    handleSelectCell(rowIndex, columnIndex)
+                                  }
+                                >
+                                  {String(cellValue) || '\u00A0'}
+                                </td>
+                              );
+                            },
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <SpreadsheetImageOverlay
+                images={insertedImages}
+                selectedSheet={selectedSheet}
+                gridRef={gridRef}
+              />
             </section>
           )}
         </section>
+        <ImageInsertPanel
+          selectedCell={selectedCellLabel}
+          selectedSheet={selectedSheet}
+          onInsert={handleInsertImage}
+        />{' '}
       </main>
 
       <Sidebar

@@ -1,0 +1,311 @@
+.image-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgb(15 23 42 / 58%);
+  backdrop-filter: blur(3px);
+}
+
+.image-editor-modal {
+  width: min(920px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  background: #ffffff;
+  border: 1px solid #dbe4f0;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgb(15 23 42 / 28%);
+}
+
+.image-editor-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 26px 18px;
+  border-bottom: 1px solid #e5eaf1;
+}
+
+.image-editor-modal__header h2 {
+  margin: 8px 0 4px;
+  font-size: 24px;
+}
+
+.image-editor-modal__header p {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.image-editor-modal__badge {
+  display: inline-block;
+  padding: 5px 10px;
+  color: #175cd3;
+  background: #eff8ff;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.image-editor-modal__close {
+  width: 38px;
+  height: 38px;
+  color: #475467;
+  background: #f8fafc;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.image-editor-modal__information {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px 26px;
+}
+
+.image-editor-modal__information div {
+  padding: 11px 13px;
+  background: #f8fafc;
+  border-radius: 9px;
+}
+
+.image-editor-modal__information span,
+.image-editor-modal__information strong {
+  display: block;
+}
+
+.image-editor-modal__information span {
+  margin-bottom: 3px;
+  color: #667085;
+  font-size: 11px;
+}
+
+.image-editor-modal__information strong {
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-editor-modal__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 450px;
+  margin: 0 26px;
+  padding: 28px;
+  overflow: auto;
+  background:
+    linear-gradient(45deg, #edf1f5 25%, transparent 25%),
+    linear-gradient(-45deg, #edf1f5 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #edf1f5 75%),
+    linear-gradient(-45deg, transparent 75%, #edf1f5 75%), #f8fafc;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0;
+  background-size: 20px 20px;
+  border: 1px solid #dbe4f0;
+  border-radius: 14px;
+}
+
+.image-editor-frame {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: visible;
+  background: #ffffff;
+  border: 2px solid #2563eb;
+  box-shadow: 0 10px 30px rgb(15 23 42 / 18%);
+}
+
+.image-editor-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.image-editor-frame__size {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 7px;
+  color: #ffffff;
+  background: rgb(15 23 42 / 78%);
+  border-radius: 5px;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.image-editor-frame__resize-handle {
+  position: absolute;
+  right: -9px;
+  bottom: -9px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: #2563eb;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 35%);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.image-editor-modal__controls {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+  gap: 14px;
+  padding: 20px 26px;
+}
+
+.image-editor-modal__controls label > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.image-editor-modal__controls select,
+.image-editor-modal__controls input[type='number'] {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  background: #ffffff;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  outline: none;
+}
+
+.image-editor-modal__controls select:focus,
+.image-editor-modal__controls input[type='number']:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 12%);
+}
+
+.image-editor-modal__number {
+  position: relative;
+}
+
+.image-editor-modal__number input {
+  padding-right: 38px;
+}
+
+.image-editor-modal__number > span {
+  position: absolute;
+  top: 50%;
+  right: 11px;
+  color: #667085;
+  font-size: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.image-editor-modal__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 24px;
+  cursor: pointer;
+}
+
+.image-editor-modal__checkbox input {
+  width: 17px;
+  height: 17px;
+}
+
+.image-editor-modal__checkbox > span {
+  margin: 0 !important;
+}
+
+.image-editor-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 26px 24px;
+  border-top: 1px solid #e5eaf1;
+}
+
+.image-editor-modal__footer > div {
+  display: flex;
+  gap: 10px;
+}
+
+.image-editor-modal__footer button {
+  min-height: 42px;
+  padding: 10px 18px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.image-editor-modal__reset,
+.image-editor-modal__cancel {
+  color: #344054;
+  background: #ffffff;
+  border: 1px solid #d0d5dd;
+}
+
+.image-editor-modal__confirm {
+  color: #ffffff;
+  background: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.image-editor-modal__confirm:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 760px) {
+  .image-editor-backdrop {
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .image-editor-modal {
+    max-height: calc(100vh - 20px);
+  }
+
+  .image-editor-modal__information,
+  .image-editor-modal__controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .image-editor-modal__stage {
+    min-height: 350px;
+    margin: 0 16px;
+    padding: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .image-editor-modal__information,
+  .image-editor-modal__controls {
+    grid-template-columns: 1fr;
+  }
+
+  .image-editor-modal__checkbox {
+    padding-top: 0;
+  }
+
+  .image-editor-modal__footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .image-editor-modal__footer > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
