@@ -25,21 +25,34 @@ function Homepage() {
   const [selectedImageId, setSelectedImageId] = useState(null);
 
   const gridRef = useRef(null);
-
   const handleInsertImage = newImage => {
+    const targetCell = gridRef.current?.querySelector(
+      `[data-cell-address="${newImage.cellAddress}"]`,
+    );
+
+    const cellRectangle = targetCell?.getBoundingClientRect();
+
+    const imageWithAnchorMetrics = {
+      ...newImage,
+
+      anchorCellWidth: cellRectangle?.width || 96,
+
+      anchorCellHeight: cellRectangle?.height || 24,
+    };
+
     setInsertedImages(currentImages => {
       const imagesWithoutCurrentCell = currentImages.filter(
         image =>
           !(
-            image.sheetName === newImage.sheetName &&
-            image.cellAddress === newImage.cellAddress
+            image.sheetName === imageWithAnchorMetrics.sheetName &&
+            image.cellAddress === imageWithAnchorMetrics.cellAddress
           ),
       );
 
-      return [...imagesWithoutCurrentCell, newImage];
+      return [...imagesWithoutCurrentCell, imageWithAnchorMetrics];
     });
 
-    setSelectedImageId(newImage.id);
+    setSelectedImageId(imageWithAnchorMetrics.id);
   };
 
   const handleUpdateImage = useCallback((imageId, changes) => {
@@ -237,19 +250,32 @@ function Homepage() {
     startListening();
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!sheetNames.length) {
       setStatus('Primero debes subir un archivo de Excel.');
       return;
     }
 
-    downloadExcelFile({
-      sheetNames,
-      sheetsData,
-      fileName,
-    });
+    try {
+      setStatus('Generando archivo con imágenes...');
 
-    setStatus('Archivo modificado descargado correctamente.');
+      await downloadExcelFile({
+        sheetNames,
+        sheetsData,
+        fileName,
+        images: insertedImages,
+      });
+
+      setStatus('Archivo con imágenes descargado correctamente.');
+    } catch (error) {
+      console.error('Error al generar el archivo:', error);
+
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo generar el archivo Excel.',
+      );
+    }
   };
 
   return (

@@ -1,4 +1,6 @@
 import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
+import { addImagesToWorkbook } from '../features/excelImages/services/excelImageExportService';
 
 export function getColumnLabel(index) {
   let label = '';
@@ -135,19 +137,60 @@ function readFileWithFileReader(file) {
   });
 }
 
-export function downloadExcelFile({ sheetNames, sheetsData, fileName }) {
-  const workbook = XLSX.utils.book_new();
+function downloadWorkbookBlob(blob, fileName) {
+  const downloadUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+
+  anchor.href = downloadUrl;
+  anchor.download = fileName;
+  anchor.style.display = 'none';
+
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(downloadUrl);
+  }, 1000);
+}
+
+export async function downloadExcelFile({
+  sheetNames,
+  sheetsData,
+  fileName,
+  images = [],
+}) {
+  const workbook = new ExcelJS.Workbook();
+
+  workbook.creator = 'ExcelTool';
+  workbook.created = new Date();
+  workbook.modified = new Date();
 
   sheetNames.forEach(sheetName => {
-    const data = sheetsData[sheetName] || [];
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    const worksheet = workbook.addWorksheet(sheetName);
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    const data = sheetsData[sheetName] || [];
+
+    data.forEach((row, rowIndex) => {
+      const worksheetRow = worksheet.getRow(rowIndex + 1);
+
+      row.forEach((cellValue, columnIndex) => {
+        worksheetRow.getCell(columnIndex + 1).value = cellValue;
+      });
+    });
+  });
+
+  await addImagesToWorkbook(workbook, images);
+
+  const outputBuffer = await workbook.xlsx.writeBuffer();
+
+  const outputBlob = new Blob([outputBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
 
   const cleanName = fileName
     ? fileName.replace(/\.(xlsx|xls)$/i, '')
     : 'archivo_excel';
 
-  XLSX.writeFile(workbook, `${cleanName}_modificado.xlsx`);
+  downloadWorkbookBlob(outputBlob, `${cleanName}_modificado.xlsx`);
 }
